@@ -1,9 +1,9 @@
 {
   "development": {
     "database":"user_service",
-    "username":"root",
+    "username":"dandean",
     "password":null,
-    "host":"127.0.0.1"
+    "host":"localhost"
   },
   "test": {
     "username":"root",

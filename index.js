@@ -10,9 +10,9 @@ var config = JSON.parse(fs.readFileSync('./config/config.json'))['development'];
 
 // Connect to the database:
 var sequelize = new Sequelize(config.database, config.username, config.password, {
-  host: "127.0.0.1",
-  port: 3306,
-  dialect: 'mysql'
+  dialect: 'postgres',
+  host: config.host,
+  port: 5432
 });
 
 // Load the user model:

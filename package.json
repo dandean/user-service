@@ -12,7 +12,8 @@
   "dependencies": {
     "restify": "*",
     "mysql": "*",
-    "sequelize": "*"
+    "sequelize": "*",
+    "pg": "~2.11.1"
   },
   "devDependencies": {
     "mocha": "*"
