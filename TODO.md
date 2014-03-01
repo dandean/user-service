@@ -20,3 +20,6 @@ Install [Postgress.app](http://postgresapp.com), then read docs.
     $ psql
     $ CREATE DATABASE user_service;
     $ \list
+    $ CREATE EXTENSION "uuid-ossp";
+    $ SELECT uuid_generate_v4();
+    $ # Replace this with gen_random_uuid() at some point

@@ -41,35 +41,25 @@ server.get('/users', function(req, res, cb) {
 /**
  * POST /users
  *
- * curl -v -X POST application/json" -d '{"username":"dandean","email":"me@dandean.com"}' http://0.0.0.0:8080/users
+ * curl -v -X POST -H "Content-Type: application/json" -d '{"username":"dandean","email":"me@dandean.com"}' http://0.0.0.0:8082/users
 **/
 server.post('/users', function(req, res, next) {
-  // MySQL cannot auto-insert a generated UUID and return it. Must be done in
-  // two separate queries:
-  sequelize.query('SELECT UUID();', null, { raw: true }).done(function(error, result) {
-    if (error) {
-      res.send(500, error)
-      return next();
-    }
+  var data = {
+    username: req.body.username,
+    email: req.body.email
+  };
 
-    var data = {
-      id: result[0]['UUID()'],
-      username: req.body.username,
-      email: req.body.email
-    };
-
-    User.create(data).done(function(error, user) {
-      if (error) throw error;
-      res.send(200, user.values);
-      next();
-    });
+  User.create(data).done(function(error, user) {
+    if (error) throw error;
+    res.send(200, user.values);
+    next();
   });
 });
 
 /**
  * GET /users/:id
  *
- * curl -v -X GET http://0.0.0.0:8080/users/13f507b6-0892-11e3-8dba-22e206753ccb
+ * curl -v -X GET http://0.0.0.0:8082/users/2cef5667-d14d-49f6-974b-79b0e06cef73
 **/
 server.get('/users/:id', function(req, res, next) {
   User.find({ where: { id: req.params.id } }).complete(function(error, user) {
@@ -91,6 +81,6 @@ server.del('/users/:id', function(req, res, cb) {
 });
 
 
-server.listen(8080, function() {
+server.listen(8082, function() {
   console.log('%s listening at %s', server.name, server.url);
 });

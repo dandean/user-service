@@ -21,20 +21,15 @@ var User = sequelize.import(__dirname + '/../models/user');
 sequelize
   .sync({ force: true })
   .success(function() {
-    // Create the trigger
-    // var query = '';
-    // query += 'CREATE TRIGGER `before_insert_users` BEFORE INSERT ON `Users` FOR EACH ROW ';
-    // query += 'SET NEW.id = UUID(), NEW.createdAt = NOW();';
-
-    // sequelize
-    //   .query(query, null, { raw: true })
-    //   .success(function() {
-    //     console.log('TRIGGER SUCCESS');
-    //   })
-    //   .error(function() {
-    //     console.error('ERROR Creating Trigger');
-    //     console.log(arguments);
-    //   });
+    sequelize
+      .query('CREATE EXTENSION IF NOT EXISTS "uuid-ossp"')
+      .success(function() {
+        console.log('Created uuid-ossp Extension');
+      })
+      .error(function() {
+        console.error('ERROR Creating uuid-ossp Extension');
+        console.log(arguments);
+      });
   })
   .error(function() {
     console.log('ERROR');
