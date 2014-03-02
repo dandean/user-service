@@ -25,6 +25,20 @@ var server = restify.createServer({
 server.use(restify.queryParser());
 server.use(restify.bodyParser());
 
+// TODO: Move UnprocessableEntity into its own module:
+var util = require('util');
+
+function UnprocessableEntity(message) {
+  restify.RestError.call(this, {
+    restCode: 'UnprocessableEntity',
+    statusCode: 422,
+    message: message,
+    constructorOpt: UnprocessableEntity
+  });
+  this.name = 'UnprocessableEntity';
+};
+util.inherits(UnprocessableEntity, restify.RestError);
+
 /**
  * GET /users
  *
@@ -50,7 +64,16 @@ server.post('/users', function(req, res, next) {
   };
 
   User.create(data).done(function(error, user) {
-    if (error) throw error;
+    if (error) {
+      if (error.username)
+        return next(new UnprocessableEntity(error.username[0]));
+
+      if (error.email)
+        return next(new UnprocessableEntity(error.email[0]));
+
+      throw error;
+    }
+
     res.send(200, user.values);
     next();
   });

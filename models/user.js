@@ -14,7 +14,9 @@ module.exports = function(sequelize, DataTypes) {
       unique: true,
       allowNull: false,
       validate: {
-        isEmail: true
+        isEmail: {
+          msg: 'Invalid email address'
+        }
       }
     },
 
@@ -23,7 +25,9 @@ module.exports = function(sequelize, DataTypes) {
       unique: true,
       allowNull: false,
       validate: {
-        isAlphanumeric: true
+        isAlphanumeric: {
+          msg: 'Invalid username, only letters and numbers are allowed'
+        }
       }
     }
   });
