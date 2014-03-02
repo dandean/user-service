@@ -88,8 +88,12 @@ server.get('/users/:id', function(req, res, next) {
   User.find({ where: { id: req.params.id } }).complete(function(error, user) {
     if (error) throw error;
 
-    res.send(user == null ? 404 : 200, user.values);
+    if (user == null) {
+      res.send(404);
 
+    } else {
+      res.send(200, user.values);
+    }
     next();
   });
 });
