@@ -1,4 +1,5 @@
 "use strict";
+var bcrypt = require('bcrypt');
 
 module.exports = function(sequelize, DataTypes) {
   return sequelize.define('User', {
@@ -28,6 +29,35 @@ module.exports = function(sequelize, DataTypes) {
         isAlphanumeric: {
           msg: 'Invalid username, only letters and numbers are allowed'
         }
+      }
+    },
+
+    password: {
+      type: DataTypes.STRING(60),
+      allowNull: false
+    },
+  },
+
+  {
+    paranoid: true,
+    instanceMethods: {
+      setPassword: function(password, callback) {
+        return bcrypt.genSalt(10, function(error, salt) {
+          if (error) return callback(error);
+
+          return bcrypt.hash(password, salt, function(error, encrypted) {
+            if (error) return callback(error);
+
+            this.password = encrypted;
+            this.salt = salt;
+            return callback();
+          }.bind(this));
+        }.bind(this));
+      },
+      verifyPassword: function(password, callback) {
+        return bcrypt.compare(password, this.password, function(error, res) {
+          return callback(error, res);
+        });
       }
     }
   });
