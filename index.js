@@ -58,25 +58,73 @@ server.get('/users', function(req, res, cb) {
  * curl -v -X POST -H "Content-Type: application/json" -d '{"username":"dandean","email":"me@dandean.com"}' http://0.0.0.0:8082/users
 **/
 server.post('/users', function(req, res, next) {
+  var user;
+  var password;
   var data = {
     username: req.body.username,
     email: req.body.email
   };
 
-  User.create(data).done(function(error, user) {
-    if (error) {
-      if (error.username)
-        return next(new UnprocessableEntity(error.username[0]));
+  return checkForExistingUser();
 
-      if (error.email)
-        return next(new UnprocessableEntity(error.email[0]));
+  function checkForExistingUser() {
+    User.find({
+      where: Sequelize.or(
+        { username: data.username },
+        { email: data.email }
+      )
+    }).complete(function(error, user) {
+      if (user)
+        return next(new restify.ConflictError('The username or email is already taken'));
 
-      throw error;
-    }
+      testPasswordValue();
+    });
+  }
 
-    res.send(200, user.values);
+  function testPasswordValue() {
+    password = (req.body.password || '').trim();
+    if (password == '')
+      return next(new UnprocessableEntity('Password is required'));
+
+    if (/.{5,}/.test(password) == false)
+      return next(new UnprocessableEntity('Password must be at least five characters'));
+
+    buildUser();
+  }
+
+  function buildUser() {
+    user = User.build(data);
+    setPassword();
+  }
+
+  function setPassword() {
+    user.setPassword(password, function(error) {
+      if (error) throw error;
+      save();
+    });
+  }
+
+  function save(callback) {
+    user.save().complete(function(error, user) {
+      if (error) {
+        if (error.username)
+          return next(new UnprocessableEntity(error.username[0]));
+
+        if (error.email)
+          return next(new UnprocessableEntity(error.email[0]));
+
+        throw error;
+      }
+      done();
+    });
+  }
+
+  function done() {
+    var result = user.toJSON();
+    delete result.password;
+    res.send(200, result);
     next();
-  });
+  }
 });
 
 /**
@@ -106,7 +154,6 @@ server.patch('/users/:id', function(req, res, cb) {
 
 server.del('/users/:id', function(req, res, cb) {
 });
-
 
 server.listen(8082, function() {
   console.log('%s listening at %s', server.name, server.url);
