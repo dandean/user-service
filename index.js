@@ -152,7 +152,28 @@ server.put('/users/:id', function(req, res, cb) {
 server.patch('/users/:id', function(req, res, cb) {
 });
 
-server.del('/users/:id', function(req, res, cb) {
+/**
+ * DELETE /users/:id
+ *
+ * curl -v -X DELETE http://0.0.0.0:8082/users/31d78fe5-e9bc-4a3c-b7c5-621b307a1a5f
+**/
+server.del('/users/:id', function(req, res, next) {
+  User.find(req.params.id).complete(function(error, user) {
+    if (error) throw error;
+
+    if (user == null) {
+      res.send(404);
+
+    } else {
+
+      user.destroy().complete(function(error) {
+        if (error) throw error;
+        res.send(204);
+        next();
+      });
+    }
+  });
+
 });
 
 server.listen(8082, function() {
