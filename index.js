@@ -130,10 +130,10 @@ server.post('/users', function(req, res, next) {
 /**
  * GET /users/:id
  *
- * curl -v -X GET http://0.0.0.0:8082/users/2cef5667-d14d-49f6-974b-79b0e06cef73
+ * curl -v -X GET http://0.0.0.0:8082/users/31d78fe5-e9bc-4a3c-b7c5-621b307a1a5f
 **/
 server.get('/users/:id', function(req, res, next) {
-  User.find({ where: { id: req.params.id } }).complete(function(error, user) {
+  User.find(req.params.id).complete(function(error, user) {
     if (error) throw error;
 
     if (user == null) {
