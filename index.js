@@ -146,10 +146,70 @@ server.get('/users/:id', function(req, res, next) {
   });
 });
 
-server.put('/users/:id', function(req, res, cb) {
+server.put('/users/:id', function(req, res, next) {
 });
 
-server.patch('/users/:id', function(req, res, cb) {
+/**
+ * PATCH /users/:id
+ *
+ * curl -v -X PATCH -H "Content-Type: application/json" -d '{"username":"dandean4","email":"me4a@dandean.com"}' http://0.0.0.0:8082/users/833cecbc-8e67-4a20-8a7f-26e3eee9b2ae
+**/
+server.patch('/users/:id', function(req, res, next) {
+  var user;
+  var email = req.params.email;
+  var username = req.params.username;
+
+  return findUser();
+
+  function findUser() {
+    User.find(req.params.id).complete(function(error, userResult) {
+      if (error) throw error;
+
+      if (userResult == null) {
+        res.send(404);
+        next();
+
+      } else {
+        user = userResult;
+        findUserByEmail();
+      }
+    });
+  }
+
+  function findUserByEmail() {
+    if (!email || user.email == email) return findUserByUsername();
+
+    User.find({ where: { email: email } }).complete(function(error, user) {
+      if (user)
+        return next(new restify.ConflictError('The email is already taken'));
+
+      findUserByUsername();
+    });
+  }
+
+  function findUserByUsername() {
+    if (!username || user.username == username) return updateUser();
+
+    User.find({ where: { username: username } }).complete(function(error, user) {
+      if (user)
+        return next(new restify.ConflictError('The username is already taken'));
+
+      updateUser();
+    });
+  }
+
+  function updateUser() {
+    var attributes = {};
+    if (email) attributes.email = email;
+    if (username) attributes.username = username;
+
+    user.updateAttributes(attributes).complete(function(error, user) {
+      if (error) throw error;
+
+      res.send(200, user.values);
+      next();
+    });
+  }
 });
 
 /**
