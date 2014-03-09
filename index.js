@@ -140,24 +140,30 @@ server.get('/users/:id', function(req, res, next) {
       res.send(404);
 
     } else {
-      res.send(200, user.values);
+
+      var result = user.toJSON();
+      delete result.password;
+      res.send(200, result);
     }
     next();
   });
 });
 
 server.put('/users/:id', function(req, res, next) {
+  res.send(404);
+  next();
 });
 
 /**
  * PATCH /users/:id
  *
- * curl -v -X PATCH -H "Content-Type: application/json" -d '{"username":"dandean4","email":"me4a@dandean.com"}' http://0.0.0.0:8082/users/833cecbc-8e67-4a20-8a7f-26e3eee9b2ae
+ * curl -v -X PATCH -H "Content-Type: application/json" -d '{"username":"dandean","email":"me@dandean.com", "password": "blah1234"}' http://0.0.0.0:8082/users/ec33bead-d53c-4de5-b168-6df836fa25da
 **/
 server.patch('/users/:id', function(req, res, next) {
   var user;
   var email = req.params.email;
   var username = req.params.username;
+  var password = (req.body.password || '').trim();
 
   return findUser();
 
@@ -188,12 +194,30 @@ server.patch('/users/:id', function(req, res, next) {
   }
 
   function findUserByUsername() {
-    if (!username || user.username == username) return updateUser();
+    if (!username || user.username == username) return testPasswordValue();
 
     User.find({ where: { username: username } }).complete(function(error, user) {
       if (user)
         return next(new restify.ConflictError('The username is already taken'));
 
+      testPasswordValue();
+    });
+  }
+
+  function testPasswordValue() {
+    if (password == '') return updateUser();
+
+    if (/.{5,}/.test(password) == false)
+      return next(new UnprocessableEntity('Password must be at least five characters'));
+
+    setPassword();
+  }
+
+  var passwordWasSet = false;
+  function setPassword() {
+    passwordWasSet = true;
+    user.setPassword(password, function(error) {
+      if (error) throw error;
       updateUser();
     });
   }
@@ -202,11 +226,14 @@ server.patch('/users/:id', function(req, res, next) {
     var attributes = {};
     if (email) attributes.email = email;
     if (username) attributes.username = username;
+    if (passwordWasSet) attributes.password = user.password;
 
     user.updateAttributes(attributes).complete(function(error, user) {
       if (error) throw error;
 
-      res.send(200, user.values);
+      var result = user.toJSON();
+      delete result.password;
+      res.send(200, result);
       next();
     });
   }
@@ -232,6 +259,46 @@ server.del('/users/:id', function(req, res, next) {
         next();
       });
     }
+  });
+});
+
+/**
+ * POST /authenticate
+ *
+ * curl -v -X POST -H "Content-Type: application/json" -d '{"username":"dandean","password":"blah1234"}' http://0.0.0.0:8082/authenticate
+ * curl -v -X POST -H "Content-Type: application/json" -d '{"email":"me@dandean.com","password":"blah1234"}' http://0.0.0.0:8082/authenticate
+**/
+server.post('/authenticate', function(req, res, next) {
+  var username = (req.params.username || '').trim();
+  var email = (req.params.email || '').trim();
+  var password = (req.params.password || '').trim();
+
+  if (username == '' && password == '')
+    return next(new restify.NotAuthorizedError('Username or email is required'));
+
+  if (password == '')
+    return next(new restify.NotAuthorizedError('Password is required'));
+
+  var where = {};
+  if (username) where.username = username;
+  if (email) where.email = email;
+
+  User.find({ where: where }).complete(function(error, user) {
+    if (error) {
+      console.error(error)
+      return next(new restify.InternalError(error));
+    }
+    if (user == null) return next(new restify.ResourceNotFoundError());
+
+    user.verifyPassword(password, function(error, result) {
+      if (error) {
+        console.error(error)
+        return next(new restify.InternalError(error));
+      }
+      if (result == false) return next(new restify.NotAuthorizedError('Authentication failed'));
+
+      res.send(200, user.toJSON());
+    });
   });
 
 });

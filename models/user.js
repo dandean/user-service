@@ -49,7 +49,6 @@ module.exports = function(sequelize, DataTypes) {
             if (error) return callback(error);
 
             this.password = encrypted;
-            this.salt = salt;
             return callback();
           }.bind(this));
         }.bind(this));
