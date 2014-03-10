@@ -3,6 +3,7 @@
 var fs = require('fs');
 var restify = require('restify');
 var bunyan = require('bunyan');
+var UnprocessableEntity = require('./lib/unprocessable-entity');
 var Sequelize = require('sequelize');
 
 // Manually import database configuration. Currently in this file to allow the
@@ -26,20 +27,6 @@ var server = restify.createServer({
 server.use(restify.queryParser());
 server.use(restify.bodyParser());
 server.use(restify.requestLogger());
-
-// TODO: Move UnprocessableEntity into its own module:
-var util = require('util');
-
-function UnprocessableEntity(message) {
-  restify.RestError.call(this, {
-    restCode: 'UnprocessableEntity',
-    statusCode: 422,
-    message: message,
-    constructorOpt: UnprocessableEntity
-  });
-  this.name = 'UnprocessableEntity';
-};
-util.inherits(UnprocessableEntity, restify.RestError);
 
 /**
  * GET /users
@@ -94,10 +81,10 @@ server.post('/users', function(req, res, next) {
   function testPasswordValue() {
     password = (req.body.password || '').trim();
     if (password == '')
-      return next(new UnprocessableEntity('Password is required'));
+      return next(new restify.UnprocessableEntity('Password is required'));
 
     if (/.{5,}/.test(password) == false)
-      return next(new UnprocessableEntity('Password must be at least five characters'));
+      return next(new restify.UnprocessableEntity('Password must be at least five characters'));
 
     buildUser();
   }
@@ -121,10 +108,10 @@ server.post('/users', function(req, res, next) {
     user.save().complete(function(error, user) {
       if (error) {
         if (error.username)
-          return next(new UnprocessableEntity(error.username[0]));
+          return next(new restify.UnprocessableEntity(error.username[0]));
 
         if (error.email)
-          return next(new UnprocessableEntity(error.email[0]));
+          return next(new restify.UnprocessableEntity(error.email[0]));
 
         req.log.error(error);
         return next(new restify.InternalError(error));
@@ -238,7 +225,7 @@ server.patch('/users/:id', function(req, res, next) {
     if (password == '') return updateUser();
 
     if (/.{5,}/.test(password) == false)
-      return next(new UnprocessableEntity('Password must be at least five characters'));
+      return next(new restify.UnprocessableEntity('Password must be at least five characters'));
 
     setPassword();
   }
