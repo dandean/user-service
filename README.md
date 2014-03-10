@@ -32,6 +32,11 @@ Creates a new user
 
 Gets an array of all users. Paging? Filtering?
 
+* `curl -v -X GET "http://0.0.0.0:8082/users"`
+* `curl -v -X GET "http://0.0.0.0:8082/users?query=dandean"` - Search all fields
+* `curl -v -X GET "http://0.0.0.0:8082/users?username=dandean"`
+* `curl -v -X GET "http://0.0.0.0:8082/users?email=dandean"`
+
 
 ### `GET /users/:id`
 
