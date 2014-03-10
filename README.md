@@ -17,6 +17,8 @@ Schema
 | `modifiedAt`        | Timestamp    | Date modified               | NOT NULL        |
 | `deletedAt`         | Timestamp    | Date deleted                | NOT NULL        |
 
+See the [model definition](lib/models/user.js) for how thes schema is declared.
+
 
 API
 ---
