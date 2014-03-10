@@ -7,48 +7,46 @@ SQL-backed REST API for User information
 Schema
 ------
 
-| Field               | Type         | Description                 | Attributes
+| Field               | Type         | Description                 | Attributes      |
 | ------------------- | ---------    | --------------------------- | --------------- | 
-| `id`                | CHAR(36)     | UUID of this user           | PRIMARY KEY     |
+| `id`                | UUID         | UUID of this user           | PRIMARY KEY     |
 | `username`          | VARCHAR(120) | User username               | NOT NULL UNIQUE |
 | `email`             | VARCHAR(255) | User email                  | NOT NULL UNIQUE |
 | `password`          | VARCHAR(255) | Hashed/salted User password | NOT NULL        |
-| `when_created`      | DATE         | |
-| `when_modified`     | DATE         | |
+| `createdAt`         | Timestamp    | Date created                | NOT NULL        |
+| `modifiedAt`        | Timestamp    | Date modified               | NOT NULL        |
+| `deletedAt`         | Timestamp    | Date deleted                | NOT NULL        |
 
 
 API
 ---
 
-**POST   /user-api/users**
+**POST   /users**
 
 Creates a new user
 
-**GET    /user-api/users**
+
+**GET    /users**
 
 Gets an array of all users. Paging? Filtering?
 
-**GET    /user-api/users/:id**
+
+**GET    /users/:id**
 
 Gets a specific user.
 
-**PUT    /user-api/users/:id**
 
-Replaces the user object with new values.
-
-**PATCH  /user-api/users/:id**
+**PATCH  /users/:id**
 
 Patches the user with specific properties.
 
-**DELETE /user-api/users/:id**
+
+**DELETE /users/:id**
 
 Deletes the user.
 
-**GET    /user-api/usernames/:username**
 
-Searches for a user by username.
-
-**POST   /user-api/authenticate**
+**POST   /authenticate**
 
 Authenticates a username or email along with a password.
 
@@ -56,12 +54,6 @@ Authenticates a username or email along with a password.
 Technical details
 -----------------
 
-* restify
-* mysql
-
-
-TODO
-----
-
-* Choose a database migration tool
-* 
+* Server API build on [Restify](https://github.com/mcavage/node-restify)
+* Database is Postgres
+* [Sequelize](http://sequelizejs.com/) is used to communicate with Postgres

@@ -15,7 +15,7 @@ var sequelize = new Sequelize(config.database, config.username, config.password,
 });
 
 // Load the user model:
-var User = sequelize.import(__dirname + '/../models/user');
+var User = sequelize.import(__dirname + '/../lib/models/user');
 
 // Synchronize sequelize models with the database:
 sequelize
