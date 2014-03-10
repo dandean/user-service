@@ -58,6 +58,7 @@ Service.server = server;
 // HTTP RESOURCES
 //
 
+require('./lib/resources/authentication');
 require('./lib/resources/users');
 
 //
