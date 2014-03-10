@@ -69,7 +69,7 @@ var server = restify.createServer({
   version: '0.0.0',
   log: log
 });
-server.use(restify.queryParser());
+server.use(restify.queryParser({ mapParams: false }));
 server.use(restify.bodyParser());
 server.use(restify.requestLogger());
 
