@@ -21,32 +21,32 @@ Schema
 API
 ---
 
-**POST   /users**
+### `POST /users`
 
 Creates a new user
 
 
-**GET    /users**
+### `GET /users`
 
 Gets an array of all users. Paging? Filtering?
 
 
-**GET    /users/:id**
+### `GET /users/:id`
 
 Gets a specific user.
 
 
-**PATCH  /users/:id**
+### `PATCH /users/:id`
 
 Patches the user with specific properties.
 
 
-**DELETE /users/:id**
+### `DELETE /users/:id`
 
 Deletes the user.
 
 
-**POST   /authenticate**
+### `POST /authenticate`
 
 Authenticates a username or email along with a password.
 
