@@ -59,3 +59,27 @@ Technical details
 * Server API build on [Restify](https://github.com/mcavage/node-restify)
 * Database is Postgres
 * [Sequelize](http://sequelizejs.com/) is used to communicate with Postgres
+
+
+Logging
+-------
+
+Logs are written to `logs/trace.log` in JSON format using [Bunyan](https://github.com/trentm/node-bunyan).
+
+```sh
+npm install -g bunyan
+```
+
+Pipe application output to `bunyan` to get pretty-printed stdout logs:
+
+```sh
+node index.js | bunyan
+```
+
+To view logs in a human-readable format, open the log with the `bunyan` CLI tool.
+
+```sh
+bunyan logs/trace.log
+```
+
+![](https://f.cloud.github.com/assets/18332/2378250/909469f2-a88c-11e3-9a82-5b369a833184.png)
