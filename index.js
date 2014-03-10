@@ -2,6 +2,7 @@
 
 var fs = require('fs');
 var restify = require('restify');
+var bunyan = require('bunyan');
 var Sequelize = require('sequelize');
 
 // Manually import database configuration. Currently in this file to allow the
@@ -24,6 +25,7 @@ var server = restify.createServer({
 });
 server.use(restify.queryParser());
 server.use(restify.bodyParser());
+server.use(restify.requestLogger());
 
 // TODO: Move UnprocessableEntity into its own module:
 var util = require('util');
@@ -42,11 +44,14 @@ util.inherits(UnprocessableEntity, restify.RestError);
 /**
  * GET /users
  *
- * curl -v -X GET http://0.0.0.0:8080/users
+ * curl -v -X GET http://0.0.0.0:8082/users
 **/
-server.get('/users', function(req, res, cb) {
+server.get('/users', function(req, res, next) {
   User.findAll().complete(function(error, users) {
-    if (error) throw error;
+    if (error) {
+      req.log.error(error);
+      return next(new restify.InternalError(error));
+    }
     res.send(200, users);
     next();
   });
@@ -74,6 +79,11 @@ server.post('/users', function(req, res, next) {
         { email: data.email }
       )
     }).complete(function(error, user) {
+      if (error) {
+        req.log.error(error);
+        return next(new restify.InternalError(error));
+      }
+
       if (user)
         return next(new restify.ConflictError('The username or email is already taken'));
 
@@ -99,12 +109,15 @@ server.post('/users', function(req, res, next) {
 
   function setPassword() {
     user.setPassword(password, function(error) {
-      if (error) throw error;
+      if (error) {
+        req.log.error(error);
+        return next(new restify.InternalError(error));
+      }
       save();
     });
   }
 
-  function save(callback) {
+  function save() {
     user.save().complete(function(error, user) {
       if (error) {
         if (error.username)
@@ -113,7 +126,8 @@ server.post('/users', function(req, res, next) {
         if (error.email)
           return next(new UnprocessableEntity(error.email[0]));
 
-        throw error;
+        req.log.error(error);
+        return next(new restify.InternalError(error));
       }
       done();
     });
@@ -134,7 +148,10 @@ server.post('/users', function(req, res, next) {
 **/
 server.get('/users/:id', function(req, res, next) {
   User.find(req.params.id).complete(function(error, user) {
-    if (error) throw error;
+    if (error) {
+      req.log.error(error);
+      return next(new restify.InternalError(error));
+    }
 
     if (user == null) {
       res.send(404);
@@ -169,7 +186,10 @@ server.patch('/users/:id', function(req, res, next) {
 
   function findUser() {
     User.find(req.params.id).complete(function(error, userResult) {
-      if (error) throw error;
+      if (error) {
+        req.log.error(error);
+        return next(new restify.InternalError(error));
+      }
 
       if (userResult == null) {
         res.send(404);
@@ -186,6 +206,11 @@ server.patch('/users/:id', function(req, res, next) {
     if (!email || user.email == email) return findUserByUsername();
 
     User.find({ where: { email: email } }).complete(function(error, user) {
+      if (error) {
+        req.log.error(error);
+        return next(new restify.InternalError(error));
+      }
+
       if (user)
         return next(new restify.ConflictError('The email is already taken'));
 
@@ -197,6 +222,11 @@ server.patch('/users/:id', function(req, res, next) {
     if (!username || user.username == username) return testPasswordValue();
 
     User.find({ where: { username: username } }).complete(function(error, user) {
+      if (error) {
+        req.log.error(error);
+        return next(new restify.InternalError(error));
+      }
+
       if (user)
         return next(new restify.ConflictError('The username is already taken'));
 
@@ -217,7 +247,10 @@ server.patch('/users/:id', function(req, res, next) {
   function setPassword() {
     passwordWasSet = true;
     user.setPassword(password, function(error) {
-      if (error) throw error;
+      if (error) {
+        req.log.error(error);
+        return next(new restify.InternalError(error));
+      }
       updateUser();
     });
   }
@@ -229,7 +262,10 @@ server.patch('/users/:id', function(req, res, next) {
     if (passwordWasSet) attributes.password = user.password;
 
     user.updateAttributes(attributes).complete(function(error, user) {
-      if (error) throw error;
+      if (error) {
+        req.log.error(error);
+        return next(new restify.InternalError(error));
+      }
 
       var result = user.toJSON();
       delete result.password;
@@ -246,7 +282,10 @@ server.patch('/users/:id', function(req, res, next) {
 **/
 server.del('/users/:id', function(req, res, next) {
   User.find(req.params.id).complete(function(error, user) {
-    if (error) throw error;
+    if (error) {
+      req.log.error(error);
+      return next(new restify.InternalError(error));
+    }
 
     if (user == null) {
       res.send(404);
@@ -254,7 +293,10 @@ server.del('/users/:id', function(req, res, next) {
     } else {
 
       user.destroy().complete(function(error) {
-        if (error) throw error;
+        if (error) {
+          req.log.error(error);
+          return next(new restify.InternalError(error));
+        }
         res.send(204);
         next();
       });
@@ -285,14 +327,14 @@ server.post('/authenticate', function(req, res, next) {
 
   User.find({ where: where }).complete(function(error, user) {
     if (error) {
-      console.error(error)
+      req.log.error(error);
       return next(new restify.InternalError(error));
     }
     if (user == null) return next(new restify.ResourceNotFoundError());
 
     user.verifyPassword(password, function(error, result) {
       if (error) {
-        console.error(error)
+        req.log.error(error);
         return next(new restify.InternalError(error));
       }
       if (result == false) return next(new restify.NotAuthorizedError('Authentication failed'));

@@ -14,7 +14,8 @@
     "mysql": "*",
     "sequelize": "*",
     "pg": "~2.11.1",
-    "bcrypt": "~0.7.7"
+    "bcrypt": "~0.7.7",
+    "bunyan": "~0.22.1"
   },
   "devDependencies": {
     "mocha": "*"
