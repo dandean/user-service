@@ -15,9 +15,9 @@ Schema
 | `password`          | VARCHAR(255) | Hashed/salted User password | NOT NULL        |
 | `createdAt`         | Timestamp    | Date created                | NOT NULL        |
 | `modifiedAt`        | Timestamp    | Date modified               | NOT NULL        |
-| `deletedAt`         | Timestamp    | Date deleted                | NOT NULL        |
+| `deletedAt`         | Timestamp    | Date deleted                |                 |
 
-See the [model definition](lib/models/user.js) for how thes schema is declared.
+See the [model definition](lib/models/user.js) for how this schema is declared.
 
 
 API
@@ -25,7 +25,7 @@ API
 
 ### `POST /users`
 
-Creates a new user. Parameters:
+Create a new user. Parameters:
 
 * `username`
 * `email`
@@ -40,7 +40,7 @@ curl -v -X POST -H "Content-Type: application/json" \
 
 ### `GET /users`
 
-Gets an array of all users. Query parameters:
+Get an array of all users. Query parameters:
 
 * `query`: Searches all fields
 * `username`: The username field
@@ -56,7 +56,7 @@ curl -v -X GET "http://0.0.0.0:8082/users?email=dandean"
 
 ### `GET /users/:id`
 
-Gets a specific user.
+Get a specific user.
 
 ```sh
 curl -v -X GET "http://0.0.0.0:8082/users/31d78fe5-e9bc-4a3c-b7c5-621b307a1a5f"
@@ -65,7 +65,7 @@ curl -v -X GET "http://0.0.0.0:8082/users/31d78fe5-e9bc-4a3c-b7c5-621b307a1a5f"
 
 ### `PATCH /users/:id`
 
-Patches the user with specific properties.
+Patch the user with specific properties.
 
 * `username`
 * `email`
@@ -80,7 +80,7 @@ curl -v -X PATCH -H "Content-Type: application/json" \
 
 ### `DELETE /users/:id`
 
-Deletes the user.
+Delete the user.
 
 ```sh
 curl -v -X DELETE "http://0.0.0.0:8082/users/31d78fe5-e9bc-4a3c-b7c5-621b307a1a5f"
@@ -89,7 +89,7 @@ curl -v -X DELETE "http://0.0.0.0:8082/users/31d78fe5-e9bc-4a3c-b7c5-621b307a1a5
 
 ### `POST /authenticate`
 
-Authenticates a username or email along with a password.
+Authenticate a username or email along with a password.
 
 * `username` OR `email`
 * `password`
