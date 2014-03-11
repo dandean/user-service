@@ -122,7 +122,7 @@ Logs are written to `logs/trace.log` in JSON format using [Bunyan](https://githu
 npm install -g bunyan
 ```
 
-Pipe application output to `bunyan` to get pretty-printed stdout logs:
+Pipe application output to `bunyan` to see stdout logs in a human-readable format:
 
 ```sh
 node index.js | bunyan
