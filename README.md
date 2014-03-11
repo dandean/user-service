@@ -67,15 +67,42 @@ curl -v -X GET "http://0.0.0.0:8082/users/31d78fe5-e9bc-4a3c-b7c5-621b307a1a5f"
 
 Patches the user with specific properties.
 
+* `username`
+* `email`
+* `password`
+
+```sh
+curl -v -X PATCH -H "Content-Type: application/json" \
+  -d '{"username":"dandean","email":"me@dandean.com", "password": "blah1234"}' \
+  "http://0.0.0.0:8082/users/ec33bead-d53c-4de5-b168-6df836fa25da"
+```
+
 
 ### `DELETE /users/:id`
 
 Deletes the user.
 
+```sh
+curl -v -X DELETE "http://0.0.0.0:8082/users/31d78fe5-e9bc-4a3c-b7c5-621b307a1a5f"
+```
+
 
 ### `POST /authenticate`
 
 Authenticates a username or email along with a password.
+
+* `username` OR `email`
+* `password`
+
+```sh
+curl -v -X POST -H "Content-Type: application/json" \
+  -d '{"username":"dandean","password":"blah1234"}' \
+  "http://0.0.0.0:8082/authenticate"
+
+curl -v -X POST -H "Content-Type: application/json" \
+  -d '{"email":"me@dandean.com","password":"blah1234"}' \
+  "http://0.0.0.0:8082/authenticate"
+```
 
 
 Technical details
