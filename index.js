@@ -22,7 +22,15 @@ var pkg = require('./package.json');
 var environmentName = pkg.name.toUpperCase().replace(/-/g, '_') + '_ENV';
 var environment = process.env[environmentName] || 'development';
 
-var config = require('./config/' + environment + '.json');
+var config;
+try {
+  config = require('./config/' + environment + '.json');
+} catch (error) {
+  console.log(error.stack);
+  var msg = 'Cannot parse config file for environment "' + environment + '". ';
+  msg += 'Check the file at "config/' + environment + '.json".';
+  throw new Error(msg);
+}
 config.environment = environment;
 
 //
