@@ -1,5 +1,6 @@
 {
-  "name": "home-user-service",
+  "private": true,
+  "name": "user-service",
   "version": "0.0.0",
   "description": "User Service",
   "main": "index.js",

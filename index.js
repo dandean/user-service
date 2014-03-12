@@ -16,6 +16,7 @@ var Sequelize = require('sequelize');
 // sequelize CLI access using its own default file location.
 //
 
+var pkg = require('./package.json');
 var config = JSON.parse(fs.readFileSync('./config/config.json'))['development'];
 
 //
@@ -24,7 +25,7 @@ var config = JSON.parse(fs.readFileSync('./config/config.json'))['development'];
 
 var Bunyan = require('bunyan');
 var log = new Bunyan({
-  name: 'UserService',
+  name: pkg.name,
   streams: [
     {
       stream: process.stdout,
@@ -65,8 +66,8 @@ var User = sequelize.import(__dirname + "/lib/models/user");
 //
 
 var server = restify.createServer({
-  name: 'UserService',
-  version: '0.0.0',
+  name: pkg.name,
+  version: pkg.version,
   log: log
 });
 server.use(restify.queryParser({ mapParams: false }));
@@ -97,5 +98,5 @@ require('./lib/resources/users');
 //
 
 server.listen(8082, function() {
-  console.log('%s listening at %s', server.name, server.url);
+  console.log('%s@%s listening at %s', server.name, pkg.version, server.url);
 });
