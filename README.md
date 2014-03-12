@@ -105,6 +105,34 @@ curl -v -X POST -H "Content-Type: application/json" \
 ```
 
 
+Starting the Service
+--------------------
+
+First of all, make sure your database is up, and can be connected to with the
+configuration details in your config files (see the `config` directory).
+
+Start the server like this:
+
+```sh
+node index.js
+```
+
+Or, to get nice human-readable console output, do this:
+
+```sh
+node index.js | bunyan
+```
+
+The environment will default to `development`. You can start up in a different
+environment like this:
+
+```sh
+USER_SERVICE_ENV=production node index.js | bunyan
+```
+
+Environmental configuration files are in the `config` directory.
+
+
 Technical details
 -----------------
 

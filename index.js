@@ -17,7 +17,13 @@ var Sequelize = require('sequelize');
 //
 
 var pkg = require('./package.json');
-var config = JSON.parse(fs.readFileSync('./config/config.json'))['development'];
+
+// Determine the environment. Default to "development" if not set.
+var environmentName = pkg.name.toUpperCase().replace(/-/g, '_') + '_ENV';
+var environment = process.env[environmentName] || 'development';
+
+var config = require('./config/' + environment + '.json');
+config.environment = environment;
 
 //
 // CREATE AND CONFIGURE LOGGER
@@ -98,5 +104,5 @@ require('./lib/resources/users');
 //
 
 server.listen(8082, function() {
-  console.log('%s@%s listening at %s', server.name, pkg.version, server.url);
+  console.log('%s@%s (%s) listening at %s', server.name, pkg.version, environment, server.url);
 });
