@@ -104,5 +104,5 @@ require('./lib/resources/users');
 //
 
 server.listen(8082, function() {
-  console.log('%s@%s (%s) listening at %s', server.name, pkg.version, environment, server.url);
+  log.info('%s@%s (%s) listening at %s', server.name, pkg.version, environment, server.url);
 });
