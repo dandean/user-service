@@ -2,10 +2,22 @@
 
 var fs = require('fs');
 var Sequelize = require('sequelize');
+var pkg = require('../package.json');
 
-// Manually import database configuration. Currently in this file to allow the
-// sequelize CLI access using its own default file location.
-var config = JSON.parse(fs.readFileSync('./config/config.json'))['development'];
+// Determine the environment. Default to "development" if not set.
+var environmentName = pkg.name.toUpperCase().replace(/-/g, '_') + '_ENV';
+var environment = process.env[environmentName] || 'development';
+
+var config;
+try {
+  config = require('../config/' + environment + '.json');
+} catch (error) {
+  console.log(error.stack);
+  var msg = 'Cannot parse config file for environment "' + environment + '". ';
+  msg += 'Check the file at "config/' + environment + '.json".';
+  throw new Error(msg);
+}
+config.environment = environment;
 
 // Connect to the database:
 var sequelize = new Sequelize(config.database, config.username, config.password, {
