@@ -43,7 +43,7 @@ var log = new Bunyan({
   streams: [
     {
       stream: process.stdout,
-      level: 'debug'
+      level: 'trace'
     },
     {
       type: 'rotating-file',

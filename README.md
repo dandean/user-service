@@ -47,7 +47,7 @@ Get an array of all users. Query parameters:
 * `email`: The email field
 
 ```sh
-curl -v -X GET "http://0.0.0.0:8082/users"`
+curl -v -X GET "http://0.0.0.0:8082/users"
 curl -v -X GET "http://0.0.0.0:8082/users?query=dandean"
 curl -v -X GET "http://0.0.0.0:8082/users?username=dandean"
 curl -v -X GET "http://0.0.0.0:8082/users?email=dandean"
