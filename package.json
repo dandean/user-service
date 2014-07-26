@@ -5,6 +5,7 @@
   "description": "SQL-backed REST API for User information",
   "main": "index.js",
   "scripts": {
+    "start": "node index | bunyan",
     "test": "make test"
   },
   "repository": "git@github.com:dandean/user-service.git",
